@@ -2,24 +2,51 @@ import recommendationBodyFactory from "./factories/recommendationBodyFactory.js"
 
 describe("Home page", () => {
   beforeEach(() => {
-    cy.request("POST", "http://localhost:5000/e2e/truncate", {});
+    cy.resetDB();
   });
 
   it("should insert a new recommendation successfully", () => {
     const music = recommendationBodyFactory();
 
-    cy.visit("http://localhost:3000");
+    cy.insertRecommendation(music);
+    cy.contains(music.name);
 
-    cy.get("#name").type(music.name);
-    cy.get("#link").type(music.youtubeLink);
+    cy.end();
+  });
 
-    cy.intercept("POST", "http://localhost:5000/recommendations").as(
-      "insertNewRecommendation"
-    );
+  it("should increase to recommendation counter", () => {
+    const music = recommendationBodyFactory();
 
-    cy.get("Button").click();
+    cy.insertRecommendation(music);
 
-    cy.wait("@insertNewRecommendation");
+    cy.reload();
+    cy.contains(music.name);
+
+    cy.increaseCounter();
+
+    cy.end();
+  });
+
+  it("should decrease to recommendation counter", () => {
+    const music = recommendationBodyFactory();
+
+    cy.insertRecommendation(music);
+
+    cy.contains(music.name);
+    cy.decreaseCounter();
+
+    cy.end();
+  });
+
+  it("should delete the recommendation if it has -5 votes", () => {
+    const music = recommendationBodyFactory();
+
+    cy.insertRecommendation(music);
+
+    cy.contains(music.name);
+    cy.deleteRecommendation();
+
+    cy.contains("No recommendations yet! Create your own :)");
 
     cy.end();
   });

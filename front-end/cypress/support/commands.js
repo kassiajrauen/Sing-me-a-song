@@ -1,25 +1,56 @@
-// ***********************************************
-// This example commands.js shows you how to
-// create various custom commands and overwrite
-// existing commands.
-//
-// For more comprehensive examples of custom
-// commands please read more here:
-// https://on.cypress.io/custom-commands
-// ***********************************************
-//
-//
-// -- This is a parent command --
-// Cypress.Commands.add('login', (email, password) => { ... })
-//
-//
-// -- This is a child command --
-// Cypress.Commands.add('drag', { prevSubject: 'element'}, (subject, options) => { ... })
-//
-//
-// -- This is a dual command --
-// Cypress.Commands.add('dismiss', { prevSubject: 'optional'}, (subject, options) => { ... })
-//
-//
-// -- This will overwrite an existing command --
-// Cypress.Commands.overwrite('visit', (originalFn, url, options) => { ... })
+Cypress.Commands.add("resetDB", () => {
+  cy.request("POST", "http://localhost:5000/e2e/truncate", {});
+});
+
+Cypress.Commands.add("insertRecommendation", (music) => {
+  cy.visit("http://localhost:3000/");
+
+  cy.get("#name").type(music.name);
+  cy.get("#link").type(music.youtubeLink);
+
+  cy.intercept("POST", "http://localhost:5000/recommendations").as(
+    "insertNewRecommendation"
+  );
+
+  cy.get("Button").click();
+
+  cy.wait("@insertNewRecommendation");
+});
+
+Cypress.Commands.add("increaseCounter", () => {
+  cy.get("article").within(() => {
+    cy.get("div").last().should("have.text", "0");
+  });
+
+  cy.get("article").within(() => {
+    cy.get("svg:first-of-type").click();
+  });
+
+  cy.get("article").within(() => {
+    cy.get("div").last().should("have.text", "1");
+  });
+});
+
+Cypress.Commands.add("decreaseCounter", () => {
+  cy.get("article").within(() => {
+    cy.get("div").last().should("have.text", "0");
+  });
+
+  cy.get("article").within(() => {
+    cy.get("svg:last-of-type").click();
+  });
+
+  cy.reload();
+
+  cy.get("article").within(() => {
+    cy.get("div").last().should("have.text", "-1");
+  });
+});
+
+Cypress.Commands.add("deleteRecommendation", () => {
+  Cypress._.times(6, () => {
+    cy.get("article").within(() => {
+      cy.get("svg:last-of-type").click();
+    });
+  });
+});
