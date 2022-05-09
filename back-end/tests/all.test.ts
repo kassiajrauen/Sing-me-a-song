@@ -87,3 +87,49 @@ describe("POST /recommendations/:id/downvote", () =>{
 
   it.todo("should exclude recommendation", )
 })
+
+describe("GET /recommendations", () => {
+  beforeEach(async () => {
+    await prisma.$executeRaw`TRUNCATE TABLE recommendations;`;
+  });
+
+  afterAll(async () => {
+    await prisma.$disconnect();
+  });
+
+  it("should return 200 when the recommendation is an array", async () => {
+    const music = recommendationsBodyFactory();
+
+    await prisma.recommendation.create({data: {...music}}
+    );
+
+    const response = await supertest(app).get(`/recommendations`)
+
+    expect(response.body.length).toBeGreaterThan(0) 
+    expect(response.body.length).not.toBeNull() 
+    expect(response.status).toEqual(200)  
+  })
+})
+
+describe("GET /recommendations/:id", () => {
+  beforeEach(async () => {
+    await prisma.$executeRaw`TRUNCATE TABLE recommendations;`;
+  });
+
+  afterAll(async () => {
+    await prisma.$disconnect();
+  });
+
+  it("should return 200 when the recommendation is valid", async () => {
+    const music = recommendationsBodyFactory();
+
+    const createdMusic = await prisma.recommendation.create({data: {...music}}
+      );
+
+    const response = await supertest(app).get(`/recommendations/${createdMusic.id}`);
+
+    expect(response.body).toEqual(createdMusic);
+    expect(response.status).toEqual(200); 
+  })
+})
+
