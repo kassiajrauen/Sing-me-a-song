@@ -33,3 +33,57 @@ describe("POST /recommendations", () => {
     expect(response.status).toEqual(201);
   })
 });
+
+describe("POST /recommendations/:id/upvote", () => {
+  beforeEach(async () => {
+    await prisma.$executeRaw`TRUNCATE TABLE recommendations;`;
+  });
+
+  afterAll(async () => {
+    await prisma.$disconnect();
+  });
+
+  it("should return status 200 given a valid body", async () => {
+    const music = recommendationsBodyFactory();
+
+    await prisma.recommendation.create({data: {...music}}
+    );
+
+    const createdMusic = await prisma.recommendation.findUnique({ 
+      where: { name: music.name}
+    })
+    const response = await supertest(app).post(`/recommendations/${createdMusic.id}/upvote`).send()
+    const result = await prisma.recommendation.findUnique({where: {name: music.name}})
+
+    expect(result.score).toBeLessThanOrEqual(1)
+    expect(response.status).toEqual(200)
+  })
+})
+
+describe("POST /recommendations/:id/downvote", () =>{
+  beforeEach(async () => {
+    await prisma.$executeRaw`TRUNCATE TABLE recommendations;`;
+  });
+
+  afterAll(async () => {
+    await prisma.$disconnect();
+  });
+
+  it("should return status 200 given a valid body", async () => {
+    const music = recommendationsBodyFactory();
+
+    await prisma.recommendation.create({data: {...music}}
+    );
+
+    const createdMusic = await prisma.recommendation.findUnique({ 
+      where: { name: music.name}
+    })
+    const response = await supertest(app).post(`/recommendations/${createdMusic.id}/downvote`).send()
+    const result = await prisma.recommendation.findUnique({where: {name: music.name}})
+
+    expect(result.score).toBeLessThanOrEqual(-1)
+    expect(response.status).toEqual(200)
+  })
+
+  it.todo("should exclude recommendation", )
+})
