@@ -2,7 +2,7 @@ import recommendationBodyFactory from "./factories/recommendationBodyFactory.js"
 
 describe("Home page", () => {
   beforeEach(() => {
-    cy.request("POST", "http://localhost:5000/recommendations/reset", {});
+    cy.request("POST", "http://localhost:5000/e2e/truncate", {});
   });
 
   it("should insert a new recommendation successfully", () => {
