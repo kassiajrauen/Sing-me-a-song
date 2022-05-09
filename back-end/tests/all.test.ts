@@ -133,3 +133,19 @@ describe("GET /recommendations/:id", () => {
   })
 })
 
+describe("GET /recommendations/random", () => {
+  beforeEach(async () => {
+    await prisma.$executeRaw`TRUNCATE TABLE recommendations;`;
+  });
+
+  afterAll(async () => {
+    await prisma.$disconnect();
+  });
+
+  it("should return 404 when given't a random recommendation", async () => {
+    const response = await supertest(app).get(`/recommendations/random`);
+
+    expect(response.status).toEqual(404);
+  })
+})
+
