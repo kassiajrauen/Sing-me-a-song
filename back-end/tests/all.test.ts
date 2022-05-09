@@ -5,13 +5,7 @@ import recommendationsBodyFactory from "./factories/recommendationBodyFactory.js
 import faker from "@faker-js/faker";
 
 describe("POST /recommendations", () => {
-  beforeEach(async () => {
-    await prisma.$executeRaw`TRUNCATE TABLE recommendations;`;
-  });
-
-  afterAll(async () => {
-    await prisma.$disconnect();
-  });
+  truncateAndDisconnectFactory()
 
   it("should return 201 given a valid body", async () => {
     const music = recommendationsBodyFactory();
@@ -36,13 +30,7 @@ describe("POST /recommendations", () => {
 });
 
 describe("POST /recommendations/:id/upvote", () => {
-  beforeEach(async () => {
-    await prisma.$executeRaw`TRUNCATE TABLE recommendations;`;
-  });
-
-  afterAll(async () => {
-    await prisma.$disconnect();
-  });
+  truncateAndDisconnectFactory()
 
   it("should return status 200 given a valid body", async () => {
     const music = recommendationsBodyFactory();
@@ -62,13 +50,7 @@ describe("POST /recommendations/:id/upvote", () => {
 })
 
 describe("POST /recommendations/:id/downvote", () =>{
-  beforeEach(async () => {
-    await prisma.$executeRaw`TRUNCATE TABLE recommendations;`;
-  });
-
-  afterAll(async () => {
-    await prisma.$disconnect();
-  });
+  truncateAndDisconnectFactory()
 
   it("should return status 200 given a valid body", async () => {
     const music = recommendationsBodyFactory();
@@ -85,18 +67,10 @@ describe("POST /recommendations/:id/downvote", () =>{
     expect(result.score).toBeLessThanOrEqual(-1)
     expect(response.status).toEqual(200)
   })
-
-  it.todo("should exclude recommendation", )
 })
 
 describe("GET /recommendations", () => {
-  beforeEach(async () => {
-    await prisma.$executeRaw`TRUNCATE TABLE recommendations;`;
-  });
-
-  afterAll(async () => {
-    await prisma.$disconnect();
-  });
+  truncateAndDisconnectFactory()
 
   it("should return 200 when the recommendation is an array", async () => {
     const music = recommendationsBodyFactory();
@@ -113,13 +87,7 @@ describe("GET /recommendations", () => {
 })
 
 describe("GET /recommendations/:id", () => {
-  beforeEach(async () => {
-    await prisma.$executeRaw`TRUNCATE TABLE recommendations;`;
-  });
-
-  afterAll(async () => {
-    await prisma.$disconnect();
-  });
+  truncateAndDisconnectFactory()
 
   it("should return 200 when the recommendation is valid", async () => {
     const music = recommendationsBodyFactory();
@@ -135,13 +103,7 @@ describe("GET /recommendations/:id", () => {
 })
 
 describe("GET /recommendations/random", () => {
-  beforeEach(async () => {
-    await prisma.$executeRaw`TRUNCATE TABLE recommendations;`;
-  });
-
-  afterAll(async () => {
-    await prisma.$disconnect();
-  });
+  truncateAndDisconnectFactory()
 
   it("should return 404 when given't a random recommendation", async () => {
     const response = await supertest(app).get(`/recommendations/random`);
@@ -151,13 +113,7 @@ describe("GET /recommendations/random", () => {
 })
 
 describe("GET /recommendations/top/:amount", () => {
-  beforeEach(async () => {
-    await prisma.$executeRaw`TRUNCATE TABLE recommendations;`;
-  });
-
-  afterAll(async () => {
-    await prisma.$disconnect();
-  });
+  truncateAndDisconnectFactory()
 
   it('should return 200 when given the recommendations with the must votes', async () => {
     const response = await supertest(app).get(`/recommendations/top/${faker.random.numeric()}`);
@@ -167,3 +123,13 @@ describe("GET /recommendations/top/:amount", () => {
   })
 
 })
+
+async function truncateAndDisconnectFactory(){
+  beforeEach(async () => {
+      await prisma.$executeRaw`TRUNCATE TABLE recommendations;`;
+    });
+  
+  afterAll(async () => {
+  await prisma.$disconnect();
+  });
+}
