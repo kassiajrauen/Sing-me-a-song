@@ -50,4 +50,17 @@ describe("Home page", () => {
 
     cy.end();
   });
+
+  it("should navigate between pages", () => {
+    cy.visit("http://localhost:3000");
+
+    cy.get("#home").click();
+    cy.url().should("eq", "http://localhost:3000/");
+
+    cy.get("#top").click();
+    cy.url().should("eq", "http://localhost:3000/top");
+
+    cy.get("#random").click();
+    cy.url().should("eq", "http://localhost:3000/random");
+  });
 });
