@@ -2,6 +2,7 @@ import app from "../src/app.js";
 import supertest from "supertest";
 import {prisma} from "../src/database.js";
 import recommendationsBodyFactory from "./factories/recommendationBodyFactory.js";
+import faker from "@faker-js/faker";
 
 describe("POST /recommendations", () => {
   beforeEach(async () => {
@@ -149,3 +150,20 @@ describe("GET /recommendations/random", () => {
   })
 })
 
+describe("GET /recommendations/top/:amount", () => {
+  beforeEach(async () => {
+    await prisma.$executeRaw`TRUNCATE TABLE recommendations;`;
+  });
+
+  afterAll(async () => {
+    await prisma.$disconnect();
+  });
+
+  it('should return 200 when given the recommendations with the must votes', async () => {
+    const response = await supertest(app).get(`/recommendations/top/${faker.random.numeric()}`);
+
+    expect(response.status).toEqual(200);
+    expect(response.body).not.toBeNull();    
+  })
+
+})
